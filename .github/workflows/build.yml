@@ -1,0 +1,87 @@
+name: Build Diskette Demolition
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Build Windows
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Build EXE
+        run: |
+          python -m PyInstaller ^
+            --noconfirm ^
+            --clean ^
+            --windowed ^
+            --name "Diskette Demolition" ^
+            src/main.py
+
+      - name: Package Windows build
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -Path "dist/Diskette Demolition/*" `
+            -DestinationPath "Diskette-Demolition-Windows.zip"
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Diskette-Demolition-Windows
+          path: Diskette-Demolition-Windows.zip
+
+  macos:
+    name: Build macOS
+    runs-on: macos-14
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install -r requirements.txt
+
+      - name: Build APP
+        run: |
+          python3 -m PyInstaller \
+            --noconfirm \
+            --clean \
+            --windowed \
+            --name "Diskette Demolition" \
+            src/main.py
+
+      - name: Package macOS build
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            "dist/Diskette Demolition.app" \
+            "Diskette-Demolition-macOS.zip"
+
+      - name: Upload macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Diskette-Demolition-macOS
+          path: Diskette-Demolition-macOS.zip
