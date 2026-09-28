@@ -1,0 +1,8 @@
+Diskette Demolition
+
+Copyright (c) 2026
+
+This project is provided as source code for the Diskette Demolition game.
+
+See the project's repository for the licensing terms selected by its
+maintainer.
